@@ -75,8 +75,8 @@ def call_endpoint():
     """
 
     # Get longtitude and latitude data via IP
-    ip = requests.get("https://api.ipify.org").text()
-    data = requests.get(f"https://ipinfo.io/{ip}/json").json
+    ip = requests.get("https://api.ipify.org").text
+    data = requests.get(f"https://ipinfo.io/{ip}/json").json()
     loc = data.get("loc", None)
 
     if loc:
