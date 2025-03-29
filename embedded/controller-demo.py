@@ -30,9 +30,6 @@ def send_sms(ser, phone_number, message):
     ser.write(command.encode())
     time.sleep(1)
     
-    # In a complete implementation, wait for the ">" prompt here.
-    # For demo purposes, we assume the prompt is received after a delay.
-    
     # Send the message text and signal end-of-message with Ctrl+Z (ASCII 26).
     ser.write(message.encode() + b'\x1A')
     print("SMS command sent, waiting for confirmation...")
