@@ -1,0 +1,37 @@
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from datetime import timedelta
+
+from app.auth import authenticate_admin, create_access_token, get_current_user
+from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.routers import detection, ws
+
+def create_app() -> FastAPI:
+    app = FastAPI()
+
+    # Include the detection router (REST endpoints)
+    app.include_router(detection.router, prefix="", tags=["detection"])
+    # Include the WebSocket router
+    app.include_router(ws.router, prefix="", tags=["websocket"])
+
+    @app.post("/login")
+    def login(form_data: OAuth2PasswordRequestForm = Depends()):
+        """
+        OAuth2-based login (username/password).
+        """
+        if not authenticate_admin(form_data.username, form_data.password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": form_data.username},
+            expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    return app
+
+app = create_app()
