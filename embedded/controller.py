@@ -2,6 +2,7 @@ import serial
 import time
 import re
 import threading
+import requests
 
 # Serial port configuration for the SIM900 module.
 SERIAL_PORT = '/dev/ttyS0'
@@ -68,6 +69,27 @@ def send_sms(ser, phone_number, message):
     response = ser.read(ser.inWaiting()).decode('utf-8', errors='ignore')
     print("SMS send confirmation:", response)
 
+def call_endpoint():
+    """
+    Sends an HTTP POST request register the detected person.
+    """
+
+    # Get longtitude and latitude data via IP
+    ip = requests.get("https://api.ipify.org").text()
+    data = requests.get(f"https://ipinfo.io/{ip}/json").json
+    loc = data.get("loc", None)
+
+    if loc:
+        lat_str, lon_str = loc.split(",")
+        payload = {
+            "latitude": lat_str,
+            "longitude": lon_str,
+        }
+    else:
+        print("Location data not available.")
+
+    requests.post("http://localhost:8080/detect", data=payload)
+
 def monitor_serial(ser):
     """
     Continuously monitors the SIM900 serial interface for unsolicited messages.
@@ -114,6 +136,7 @@ def process_unsolicited(message, ser):
             if phone_number not in served_numbers:
                 served_numbers.add(phone_number)
                 send_sms(ser, phone_number, SMS_MESSAGE)
+                call_endpoint()
             else:
                 print(f"Phone number {phone_number} has already been served.")
         else:
