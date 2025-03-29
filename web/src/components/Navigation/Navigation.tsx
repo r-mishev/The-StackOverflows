@@ -14,6 +14,7 @@ const NavigationBar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedIn");
+    setIsLoggedIn(false);
     router.push("/");
   };
 
