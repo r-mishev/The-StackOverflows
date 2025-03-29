@@ -20,12 +20,14 @@ async def websocket_endpoint(websocket: WebSocket):
         docs = db.collection("detected_people").stream()
         for doc in docs:
             doc_dict = doc.to_dict()
+            detected_by = doc_dict.get("detected_by")
             timestamp = doc_dict.get("timestamp")
             geo_point = doc_dict.get("location")
             wants_help = doc_dict.get("wants_help")
-            if timestamp and geo_point and wants_help:
+            if detected_by and timestamp and geo_point and wants_help:
                 detected_people.append(
                     DetectedPerson(
+                        detected_by=detected_by,
                         timestamp=timestamp,
                         wants_help=wants_help,
                         latitude=geo_point.latitude,

@@ -1,6 +1,6 @@
 from datetime import datetime
 import uuid
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 
 from google.cloud.firestore_v1 import GeoPoint
@@ -15,20 +15,31 @@ from app.manager import manager
 router = APIRouter()
 
 @router.get("/people", dependencies=[Depends(get_current_user)])
-def get_detected_people() -> List[DetectedPerson]:
+def get_detected_people(current_user: dict = Depends(get_current_user)) -> List[DetectedPerson]:
     """
-    Protected endpoint: returns the entire list of detected people from Firestore.
-    Firestore stores location as a GeoPoint.
+    Protected endpoint: returns the list of detected people that were
+    detected by the currently logged-in admin. Firestore stores location 
+    as a GeoPoint, and each detected person has a 'detected_by' field 
+    set to the admin's 'id'.
     """
+    # Get the admin's unique identifier (id) from the current_user object
+    user_id = current_user.get("id")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="Admin 'id' not found in current_user")
+
     detected_people = []
     docs = db.collection("detected_people").stream()
     for doc in docs:
         doc_dict = doc.to_dict()
-        # doc_dict["location"] is a GeoPoint
+        
+        # Retrieve Firestore fields
         timestamp = doc_dict.get("timestamp")
         geo_point: GeoPoint = doc_dict.get("location")
         wants_help = doc_dict.get("wants_help")
-        if geo_point:
+        detected_by = doc_dict.get("detected_by")  # The admin's id who found/detected this person
+        
+        # Only include people where 'detected_by' matches the currently logged-in admin's id
+        if detected_by == user_id and geo_point:
             detected_people.append(
                 DetectedPerson(
                     timestamp=timestamp,
@@ -37,6 +48,7 @@ def get_detected_people() -> List[DetectedPerson]:
                     longitude=geo_point.longitude
                 )
             )
+
     return detected_people
 
 @router.post("/detect", dependencies=[Depends(get_current_user)])
@@ -54,6 +66,7 @@ async def detect_person(person: DetectedPerson):
         "timestamp": person.timestamp,
         "wants_help": person.wants_help,
         "location": geo_point
+        
     }
     # Use person's name as the Firestore doc ID
     db.collection("detected_people").document(document_id).set(data)
