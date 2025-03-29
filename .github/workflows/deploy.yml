@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -19,9 +19,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./web
 
       - name: Build project
         run: npm run build
+        working-directory: ./web
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
@@ -29,7 +31,6 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: .
+          working-directory: ./web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
