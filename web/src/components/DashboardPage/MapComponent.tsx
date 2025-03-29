@@ -84,7 +84,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ coordinates, highlightedIte
 
   return (
     <MapContainer
-      center={[52.3676, 4.9041]}
+      center={[42.1333328, 23.5499978]}
       zoom={13}
       scrollWheelZoom={true}
       style={{ height: "100%", width: "100%" }}

@@ -39,6 +39,7 @@ const DashboardPage = () => {
         const data = await res.json();
         if (Array.isArray(data)) {
           setItems(data);
+          console.log(data)
         } else {
           console.error("Expected array but got:", data);
         }
@@ -83,6 +84,8 @@ const DashboardPage = () => {
       ws.current?.close();
     };
   }, []);
+
+  console.log(highlightedId);
 
   return (
     <div className="min-h-screen flex">
