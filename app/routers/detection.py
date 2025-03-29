@@ -1,3 +1,5 @@
+from datetime import datetime
+import uuid
 from fastapi import APIRouter, Depends
 from typing import List
 
@@ -23,12 +25,14 @@ def get_detected_people() -> List[DetectedPerson]:
     for doc in docs:
         doc_dict = doc.to_dict()
         # doc_dict["location"] is a GeoPoint
+        timestamp = doc_dict.get("timestamp")
         geo_point: GeoPoint = doc_dict.get("location")
-        name = doc_dict.get("name")
+        wants_help = doc_dict.get("wants_help")
         if geo_point:
             detected_people.append(
                 DetectedPerson(
-                    name=name,
+                    timestamp=timestamp,
+                    wants_help=wants_help,
                     latitude=geo_point.latitude,
                     longitude=geo_point.longitude
                 )
@@ -41,13 +45,18 @@ async def detect_person(person: DetectedPerson):
     Protected endpoint: adds a newly detected person to Firestore as a GeoPoint
     and broadcasts it to all WebSocket connections.
     """
+    document_id = str(uuid.uuid4)
+
+    person.timestamp = datetime.now()
     geo_point = GeoPoint(person.latitude, person.longitude)
+
     data = {
-        "name": person.name,
+        "timestamp": person.timestamp,
+        "wants_help": person.wants_help,
         "location": geo_point
     }
     # Use person's name as the Firestore doc ID
-    db.collection("detected_people").document(person.name).set(data)
+    db.collection("detected_people").document(document_id).set(data)
 
     # Broadcast to all WebSocket clients
     await manager.broadcast_new_detection(person)

@@ -32,7 +32,7 @@ def authenticate_admin(username: str, password: str) -> bool:
     """
     if username != config.ADMIN_USERNAME:
         return False
-    return verify_password(password, config.hashed_admin_password)
+    return verify_password(password, config.ADMIN_PASSWORD_HASH)
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     """
