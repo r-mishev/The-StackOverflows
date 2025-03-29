@@ -1,3 +1,4 @@
+import sys
 import serial
 import time
 import re
@@ -5,7 +6,6 @@ import threading
 import requests
 
 # Serial port configuration for the SIM900 module.
-SERIAL_PORT = '/dev/ttyS0'
 BAUD_RATE = 9600
 
 # SMS message to be sent.
@@ -143,8 +143,14 @@ def process_unsolicited(message, ser):
             print("Failed to parse phone number from CLIP message.")
 
 def main():
+    if len(sys.argv) < 2:
+        print("Usage: controller.py <serial_port>")
+        sys.exit(1)
+
+    serial_port = sys.argv[1]
+
     try:
-        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+        ser = serial.Serial(serial_port, BAUD_RATE, timeout=1)
     except Exception as e:
         print("Failed to open serial port:", e)
         return
