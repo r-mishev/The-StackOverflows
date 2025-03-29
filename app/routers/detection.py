@@ -1,6 +1,5 @@
 from datetime import datetime
 import uuid
-import json
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 
@@ -9,7 +8,6 @@ from google.cloud.firestore_v1 import GeoPoint
 from app.firebase import db
 from app.auth import get_current_user
 from app.models import DetectedPerson
-from app.manager import ConnectionManager
 
 from app.manager import manager
 
