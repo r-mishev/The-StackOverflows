@@ -7,11 +7,7 @@ router = APIRouter()
 
 @router.post("/incoming_sms")
 async def handle_sms(request: Request):
-    print("Before await")
     form_data = await request.form()
-    print("SMS Came")
-    print(form_data)
-    print(pending_detections.items())
     from_number = form_data.get('From')
     body = (form_data.get('Body') or "").strip().lower()
 

@@ -1,13 +1,12 @@
 import asyncio
 from datetime import datetime
-import os
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 
 from google.cloud.firestore_v1 import GeoPoint
 
-from app.firebase import add_person_to_firestore, db
+from app.firebase import db
 from app.auth import get_current_user
 from app.models import DetectedPerson
 from app.twilio import send_sms, wait_for_no_response
@@ -75,12 +74,18 @@ async def detect_person(person: DetectedPerson, current_user: dict = Depends(get
         "latitude": person.latitude,
         "longitude": person.longitude,
         "admin_id": admin_id,
-        "phone_number": os.getenv("PERSONAL_NUMBER"),
-        "wants_help": False,
+        "phone_number": "+359894090404",  
+        "wants_help": False, 
     }
     
+    # Store in the in-memory dictionary
+    pending_detections[detection_id] = detection_data
 
-    await add_person_to_firestore(detection_id, detection_data)
+    # Send the SMS right away
+    send_sms(detection_data["phone_number"], "You now have signal. Reply 'HELP' if you need assistance.")
+    
+    # Start the 5-minute wait in background
+    asyncio.create_task(wait_for_no_response(detection_id, timeout=300))
 
-    # We do NOT add anything to Firestore yet
+    # We do NOT add anything to Firestore yet!
     return {"status": "ok", "message": f"Detection started with ID {detection_id}. SMS sent."}
