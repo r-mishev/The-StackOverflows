@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+import os
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
@@ -74,8 +75,8 @@ async def detect_person(person: DetectedPerson, current_user: dict = Depends(get
         "latitude": person.latitude,
         "longitude": person.longitude,
         "admin_id": admin_id,
-        "phone_number": "+359894090404",  # Or person.phone_number if your model includes it
-        "wants_help": False,  # default to False
+        "phone_number": os.getenv("PERSONAL_NUMBER"),
+        "wants_help": False,
     }
     
     # Store in the in-memory dictionary
@@ -87,5 +88,5 @@ async def detect_person(person: DetectedPerson, current_user: dict = Depends(get
     # Start the 5-minute wait in background
     asyncio.create_task(wait_for_no_response(detection_id, timeout=1))
 
-    # We do NOT add anything to Firestore yet!
+    # We do NOT add anything to Firestore yet
     return {"status": "ok", "message": f"Detection started with ID {detection_id}. SMS sent."}

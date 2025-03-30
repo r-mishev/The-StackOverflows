@@ -13,10 +13,6 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
 
     try:
-        # Optionally send the list of existing detected people on connect
-        # detected_people = load_existing_people_from_firestore()
-        # await manager.send_person_list(detected_people)
-
         # Keep the WebSocket connection alive
         while True:
             await websocket.receive_text()
