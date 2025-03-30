@@ -1,12 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import  APIRouter, Request
 from twilio.twiml.messaging_response import MessagingResponse
 from app.firebase import add_person_to_firestore
-
 from app.pending_data import pending_detections
 
-app = FastAPI()
+router = APIRouter()
 
-@app.post("/incoming_sms")
+@router.post("/incoming_sms")
 async def handle_sms(request: Request):
     form_data = await request.form()
     print("SMS Came")
