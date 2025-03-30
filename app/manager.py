@@ -1,4 +1,5 @@
 from typing import List
+import json
 from fastapi import WebSocket
 
 from app.models import DetectedPerson
@@ -17,10 +18,10 @@ class ConnectionManager:
     async def send_person_list(self, person_list: list[DetectedPerson]):
         data = [person.model_dump() for person in person_list]
         for connection in self.active_connections:
-            await connection.send_json({"type": "all_people", "data": data})
+            await connection.send_json({"type": "all_people", "data": json.loads(data.model_dump_json())})
 
-    async def broadcast_new_detection(self, person: DetectedPerson):
+    async def broadcast_new_detection(self, person:DetectedPerson):
         for connection in self.active_connections:
-            await connection.send_json({"type": "new_detection", "data": person.model_dump()})
+            await connection.send_json({"type": "new_detection", "data": json.loads(person.model_dump_json())})
 
 manager = ConnectionManager()

@@ -1,41 +1,56 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 
 const NavigationBar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = unknown
 
   useEffect(() => {
-    setIsLoggedIn(localStorage.getItem("loggedIn") === "true");
+    const stored = localStorage.getItem("loggedIn");
+    setIsLoggedIn(stored === "true");
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("loggedIn");
-    window.location.href = "/";
+    setIsLoggedIn(false);
+    router.push("/");
   };
 
   return (
-    <nav className="w-full flex justify-between items-center px-8 py-4 bg-black text-white border-b border-white/10">
-      <Link href="/">
-        <Button variant="link" className="cursor-pointer text-2xl font-bold text-white p-0 m-0  no-underline hover:no-underline">
-          DroneRescue
-        </Button>
+    <nav className="w-full flex justify-between items-center px-6 py-4 bg-black text-yellow-300 border-b border-yellow-400">
+      <Link href="/" className="block">
+        <img
+          src="/SkyGuardian-logo-text.png"
+          alt="SkyGuardian Logo Text"
+          className="hidden md:block h-12"
+        />
+        <img
+          src="/SkyGuardian-logo-drone.png"
+          alt="SkyGuardian Logo Drone"
+          className="block md:hidden h-10"
+        />
       </Link>
-      <div className="flex gap-4 items-center">
-        {!isLoggedIn ? (
+
+      <div className="flex items-center gap-4">
+        {isLoggedIn === null ? null : isLoggedIn ? (
           <>
             <Link href="/dashboard">
-              <Button variant="ghost" className="cursor-pointer text-white hover:underline no-underline hover:no-underline">
+              <Button className="cursor-pointer border border-yellow-300 bg-black text-yellow-300 hover:bg-yellow-400 hover:text-black">
                 Dashboard
               </Button>
             </Link>
-            <Button onClick={handleLogout} variant="outline" className="cursor-pointer text-white border-white">
+            <Button
+              className="cursor-pointer border border-yellow-300 bg-black text-yellow-300 hover:bg-yellow-400 hover:text-black"
+              onClick={handleLogout}
+            >
               Logout
             </Button>
           </>
         ) : (
           <Link href="/login">
-            <Button variant="outline" className="cursor-pointer text-white border-white">
+            <Button className="cursor-pointer border border-yellow-300 bg-black text-yellow-300 hover:bg-yellow-400 hover:text-black">
               Login
             </Button>
           </Link>

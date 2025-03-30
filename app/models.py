@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel
 
 class DetectedPerson(BaseModel):
@@ -7,7 +8,8 @@ class DetectedPerson(BaseModel):
     We store lat/long in Firestore as a GeoPoint, but
     still define them as floats here for user input.
     """
-    timestamp: datetime = None
+    timestamp: Optional[datetime] = None
+    id: Optional[str] = None
     latitude: float
     longitude: float
     wants_help: bool = False
