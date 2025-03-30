@@ -6,3 +6,4 @@ python-jose[cryptography]
 passlib[bcrypt]
 python-dotenv
 python-multipart
+twilio

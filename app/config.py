@@ -9,7 +9,7 @@ load_dotenv(ENV_PATH)
 
 # JWT configuration settings
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret")
-ALGORITHM = "HS256"
+ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
 # Password hashing context using bcrypt

@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 import uuid
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,7 +9,9 @@ from google.cloud.firestore_v1 import GeoPoint
 from app.firebase import db
 from app.auth import get_current_user
 from app.models import DetectedPerson
-from app.manager import manager
+from app.twilio import send_sms, wait_for_no_response
+
+from app.pending_data import pending_detections
 
 router = APIRouter()
 
@@ -49,32 +52,38 @@ def get_detected_people(current_user: dict = Depends(get_current_user)) -> List[
 @router.post("/detect", dependencies=[Depends(get_current_user)])
 async def detect_person(person: DetectedPerson, current_user: dict = Depends(get_current_user)):
     """
-    Adds a newly detected person to Firestore and broadcasts the detection to all WebSocket clients.
+    1) Generates a detection ID,
+    2) Sends an SMS asking the user to reply "HELP" if they need assistance,
+    3) Stores detection data in memory for up to 5 minutes,
+    4) If no "HELP" after 5 minutes => add doc with wants_help=False,
+       If "HELP" arrives => add doc with wants_help=True and cancel wait.
     """
-    document_id = str(uuid.uuid4())
 
-    # Set timestamp and document ID for the detection
-    person.timestamp = datetime.now()
-    person.id = document_id
-    geo_point = GeoPoint(person.latitude, person.longitude)
-
+    detection_id = str(uuid.uuid4())
+    
+    # Acquire admin ID from current_user
     admin_id = current_user.get("id")
     if not admin_id:
         raise HTTPException(status_code=400, detail="Admin 'id' not found in current_user")
 
-    # Prepare data for Firestore
-    data = {
-        "timestamp": person.timestamp,
-        "wants_help": person.wants_help,
-        "location": geo_point,
-        "id": document_id,
-        "detected_by": admin_id,  # Associate the admin ID with the detected person
+    # Prepare data to store in memory
+    detection_data = {
+        "timestamp": datetime.now(),
+        "latitude": person.latitude,
+        "longitude": person.longitude,
+        "admin_id": admin_id,
+        "phone_number": "+359894090404",  # Or person.phone_number if your model includes it
+        "wants_help": False,  # default to False
     }
+    
+    # Store in the in-memory dictionary
+    pending_detections[detection_id] = detection_data
 
-    # Save the detection to Firestore
-    db.collection("detected_people").document(document_id).set(data)
+    # Send the SMS right away
+    send_sms(detection_data["phone_number"], "You now have signal. Reply 'HELP' if you need assistance.")
+    
+    # Start the 5-minute wait in background
+    asyncio.create_task(wait_for_no_response(detection_id, timeout=300))
 
-    # Broadcast the detection to all WebSocket clients
-    await manager.broadcast_new_detection(person)
-
-    return {"status": "ok", "message": "Person detected and broadcasted"}
+    # We do NOT add anything to Firestore yet!
+    return {"status": "ok", "message": f"Detection started with ID {detection_id}. SMS sent."}

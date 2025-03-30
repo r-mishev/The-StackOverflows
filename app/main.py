@@ -1,9 +1,10 @@
+from typing import Any, Dict
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.auth import authenticate_admin, create_access_token, get_current_user
+from app.auth import authenticate_admin, create_access_token
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.routers import detection, ws
 
