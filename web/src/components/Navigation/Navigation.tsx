@@ -43,20 +43,20 @@ const NavigationBar = () => {
         {isLoggedIn === null ? null : isLoggedIn ? (
           <>
             <Link href="/dashboard">
-              <Button className="bg-gradient-to-r from-yellow-500 to-red-500 text-white font-semibold px-5 py-2 rounded hover:from-yellow-400 hover:to-red-400 transition-all">
+              <Button className="bg-gradient-to-r from-yellow-500 to-red-500 text-white font-semibold px-5 py-2 rounded hover:from-yellow-400 hover:to-red-400 transition-all cursor-pointer">
                 Dashboard
               </Button>
             </Link>
             <Button
               onClick={handleLogout}
-              className="bg-transparent border border-red-500 text-red-400 hover:bg-red-500 hover:text-white transition-all font-semibold px-5 py-2 rounded"
+              className="bg-transparent border border-red-500 text-red-400 hover:bg-red-500 hover:text-white transition-all font-semibold px-5 py-2 rounded cursor-pointer"
             >
               Logout
             </Button>
           </>
         ) : (
           <Link href="/login">
-            <Button className="bg-gradient-to-r from-yellow-500 to-red-500 text-white font-semibold px-5 py-2 rounded hover:from-yellow-400 hover:to-red-400 transition-all">
+            <Button className="bg-gradient-to-r from-yellow-500 to-red-500 text-white font-semibold px-5 py-2 rounded hover:from-yellow-400 hover:to-red-400 transition-all cursro-pointer">
               Login
             </Button>
           </Link>
