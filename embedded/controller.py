@@ -88,7 +88,7 @@ def call_endpoint():
     else:
         print("Location data not available.")
 
-    requests.post("http://localhost:8080/detect", data=payload)
+    requests.post("https://skyguardian-rz2e.onrender.com/detect", data=payload)
 
 def monitor_serial(ser):
     """

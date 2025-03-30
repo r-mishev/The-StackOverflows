@@ -6,29 +6,30 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
 import app.config
-
 from app.firebase import db
 
-# Reuse the OAuth2PasswordBearer for token-based auth
+# OAuth2PasswordBearer instance for token-based authentication
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Verifies if the provided plain password matches the hashed password.
+    """
     return app.config.pwd_context.verify(plain_password, hashed_password)
+
 
 def create_access_token(
     data: dict,
     expires_delta: Optional[timedelta] = None
-):
+) -> str:
     """
-    Creates a JWT token with the given data as payload.
-    We set "exp" for expiration and encode it with SECRET_KEY.
+    Generates a JWT token with the provided data as payload and expiration.
     """
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now() + expires_delta
-    else:
-        expire = datetime.now() + timedelta(minutes=15)
+    expire = datetime.now() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
+    
     encoded_jwt = jwt.encode(
         to_encode,
         app.config.SECRET_KEY,
@@ -36,43 +37,40 @@ def create_access_token(
     )
     return encoded_jwt
 
-def authenticate_admin(username: str, password: str) -> bool:
+
+def authenticate_admin(username: str, password: str) -> Optional[dict]:
     """
-    Look up the admin in Firestore by username field, not by document ID.
-    Verify the password, and return the admin record if valid.
-    Otherwise return None.
+    Authenticates the admin by verifying the username and password.
+    Returns admin data if valid, otherwise returns None.
     """
-    # Query the "admins" collection where "username" == <username param>
     admins_ref = db.collection("admins")
     query = admins_ref.where("username", "==", username).limit(1)
     results = list(query.stream())
     
-    # If no docs match, return None => "Incorrect username or password"
     if not results:
         return None
     
-    # We found at least one doc
     doc = results[0]
-    admin_data = doc.to_dict()  # e.g. { "username": "admin", "password_hash": "...", ... }
-
+    admin_data = doc.to_dict()
     hashed_pw = admin_data.get("password_hash")
-    if not hashed_pw:
-        return None
-
-    if not verify_password(password, hashed_pw):
+    
+    if not hashed_pw or not verify_password(password, hashed_pw):
         return None
     
     return admin_data
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     """
-    Dependency function that is used in protected routes to verify JWT.
+    Verifies the JWT token and returns the current admin's data.
+    Raises HTTPException if token is invalid.
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
     try:
         payload = jwt.decode(
             token,
@@ -85,16 +83,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credentials_exception
 
-    # Now do the same field-based lookup
     admins_ref = db.collection("admins")
     query = admins_ref.where("username", "==", username).limit(1)
     results = list(query.stream())
     
     if not results:
-        raise credentials_exception  # No doc found => invalid token
+        raise credentials_exception
 
     doc = results[0]
-    admin_data = doc.to_dict()
-
-    # Optionally check if admin_data is missing fields or is otherwise incomplete
-    return admin_data
+    return doc.to_dict()
