@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth import authenticate_admin, create_access_token
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
-from app.routers import detection, ws
+from app.routers import detection, ws, incoming_sms
 
 def create_app() -> FastAPI:
     """
@@ -16,7 +16,7 @@ def create_app() -> FastAPI:
 
     # Include the detection router (REST endpoints)
     app.include_router(detection.router, prefix="", tags=["detection"])
-
+    app.include_router(incoming_sms, prefix="", tags=["sms"])
     # Include the WebSocket router
     app.include_router(ws.router, prefix="", tags=["websocket"])
 
