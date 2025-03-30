@@ -25,7 +25,7 @@ cred = credentials.Certificate(my_credentials)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-def add_person_to_firestore(detection_id: str, data: Dict[str, Any], wants_help: bool) -> None:
+async def add_person_to_firestore(detection_id: str, data: Dict[str, Any], wants_help: bool) -> None:
     """
     Creates a Firestore document with the final wants_help status
     and broadcasts the new detection data over WebSocket if needed.
