@@ -33,6 +33,6 @@ async def wait_for_no_response(detection_id: str, timeout: int = 300):
         data = pending_detections.pop(detection_id)
 
         # Now actually add them to Firestore
-        await add_person_to_firestore(detection_id, data, wants_help=False)
+        await add_person_to_firestore(detection_id, data)
 
         print(f"Person {detection_id} did not respond. Added to DB with wants_help=False.")

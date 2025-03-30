@@ -85,7 +85,7 @@ async def detect_person(person: DetectedPerson, current_user: dict = Depends(get
     send_sms(detection_data["phone_number"], "You now have signal. Reply 'HELP' if you need assistance.")
     
     # Start the 5-minute wait in background
-    asyncio.create_task(wait_for_no_response(detection_id, timeout=300))
+    asyncio.create_task(wait_for_no_response(detection_id, timeout=1))
 
     # We do NOT add anything to Firestore yet!
     return {"status": "ok", "message": f"Detection started with ID {detection_id}. SMS sent."}
