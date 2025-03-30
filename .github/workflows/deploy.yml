@@ -26,6 +26,7 @@ jobs:
 
       - name: Pull Vercel env information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./web
 
       - name: Install dependencies
         run: npm install
