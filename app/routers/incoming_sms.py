@@ -16,9 +16,7 @@ async def handle_sms(request: Request):
     body = (form_data.get('Body') or "").strip().lower()
 
     if body == "help":
-        # Find the detection_id that matches this phone_number in pending_detections
-        # Because multiple detections could be pending for the same phone, 
-        # you might need a more robust approach, but here's a simple example:
+        # Find the detection_id that matches this phone_number in pending_detections:
         detection_id = None
         for d_id, d_data in pending_detections.items():
             if d_data["phone_number"] == from_number:
@@ -32,7 +30,7 @@ async def handle_sms(request: Request):
             # Actually add them with wants_help=True
             await add_person_to_firestore(detection_id, data, wants_help=True)
 
-            # Construct a TwiML response
+            # Construct a response
             response = MessagingResponse()
             response.message("Thank you for your reply. Help is on the way.")
             print(f"Person {detection_id} replied HELP. Added to DB with wants_help=True.")
