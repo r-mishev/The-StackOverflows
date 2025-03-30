@@ -77,7 +77,7 @@ const LandingPage = () => {
               Our system patrols areas with poor service and offers the ability to make emergency calls to lost people.
             </p>
           </div>
-          <img src="/flying drone.jpg" className="h-[300px] rounded-xl w-auto" alt="Flying drone" />
+          <img src="/flyingDrone.jpg" className="h-[300px] rounded-xl w-auto" alt="Flying drone" />
           <img src="/Jaliek focus turns to killing.jpg" className="h-[300px] rounded-xl w-auto" alt="Coordinated rescue" />
           <div>
             <h3 className="text-2xl font-semibold mb-2 text-white">Coordinated Rescue</h3>
