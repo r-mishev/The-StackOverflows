@@ -21,7 +21,7 @@ const NavigationBar = () => {
   };
 
   return (
-    <nav className="w-full flex justify-between items-center px-8 py-4 bg-[#1a2135] text-white border-b border-[#2d354d] shadow-sm">
+    <nav className="w-full flex justify-between items-center px-8 py-4 bg-[#0e0b0b] text-white border-b border-[#ff471a]/40 shadow-sm">
       <Link href="/" className="flex items-center gap-3 cursor-pointer">
         <Image
           src="/SkyGuardian-logo-text.png"
@@ -43,20 +43,20 @@ const NavigationBar = () => {
         {isLoggedIn === null ? null : isLoggedIn ? (
           <>
             <Link href="/dashboard">
-              <Button className="bg-transparent border border-white text-white hover:bg-white hover:text-[#1a2135] transition-all cursor-pointer">
+              <Button className="bg-gradient-to-r from-yellow-500 to-red-500 text-white font-semibold px-5 py-2 rounded hover:from-yellow-400 hover:to-red-400 transition-all">
                 Dashboard
               </Button>
             </Link>
             <Button
               onClick={handleLogout}
-              className="bg-transparent border border-white text-white hover:bg-white hover:text-[#1a2135] transition-all cursor-pointer"
+              className="bg-transparent border border-red-500 text-red-400 hover:bg-red-500 hover:text-white transition-all font-semibold px-5 py-2 rounded"
             >
               Logout
             </Button>
           </>
         ) : (
           <Link href="/login">
-            <Button className="bg-transparent border border-white text-white hover:bg-white hover:text-[#1a2135] transition-all cursor-pointer">
+            <Button className="bg-gradient-to-r from-yellow-500 to-red-500 text-white font-semibold px-5 py-2 rounded hover:from-yellow-400 hover:to-red-400 transition-all">
               Login
             </Button>
           </Link>
