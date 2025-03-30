@@ -22,12 +22,12 @@ def create_app() -> FastAPI:
 
     # Add CORS middleware for cross-origin requests from specific frontend
     app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    CORSMiddleware,
+    allow_origins=["https://skyguardianfrontend.onrender.com"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
     @app.post("/login")
     def login(form_data: OAuth2PasswordRequestForm = Depends()):

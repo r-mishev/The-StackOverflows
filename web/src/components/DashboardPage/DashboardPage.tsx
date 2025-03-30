@@ -30,7 +30,7 @@ const DashboardPage = () => {
           return;
         }
 
-        const res = await fetch(`http://${window.location.hostname}:8000/people`, {
+        const res = await fetch(`https://skyguardian-rz2e.onrender.com/people`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -39,6 +39,7 @@ const DashboardPage = () => {
         const data = await res.json();
         if (Array.isArray(data)) {
           setItems(data);
+          console.log(data)
         } else {
           console.error("Expected array but got:", data);
         }
@@ -52,7 +53,7 @@ const DashboardPage = () => {
 
   // Connect to WebSocket for live updates
   useEffect(() => {
-    ws.current = new WebSocket(`ws://${window.location.hostname}:8000/ws`);
+    ws.current = new WebSocket("wss://skyguardian-rz2e.onrender.com/ws");
 
     ws.current.onopen = () => {
       console.log("WebSocket connected ✅");
@@ -83,6 +84,8 @@ const DashboardPage = () => {
       ws.current?.close();
     };
   }, []);
+
+  console.log(highlightedId);
 
   return (
     <div className="min-h-screen flex">

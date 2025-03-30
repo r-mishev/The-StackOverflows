@@ -7,15 +7,22 @@ from google.cloud.firestore_v1 import GeoPoint
 
 from app import manager
 
-# Set up the path to the service account key
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SERVICE_ACCOUNT_PATH = os.path.join(BASE_DIR, 'serviceAccountKey.json')
+my_credentials = {
+    "type": "service_account",
+    "project_id": "skyguardian-ff27c",
+    "private_key_id": os.environ.get("PRIVATE_KEY_ID"),
+    "private_key": os.environ.get("PRIVATE_KEY").replace(r'\n', '\n'),
+    "client_email": os.environ.get("CLIENT_EMAIL"),
+    "client_id": os.environ.get("CLIENT_ID"),
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": os.environ.get("AUTH_PROVIDER_X509_CERT_URL"),
+    "universe_domain": "googleapis.com"
+}
 
-# Initialize Firebase Admin SDK with service account credentials
-cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+cred = credentials.Certificate(my_credentials)
 firebase_admin.initialize_app(cred)
-
-# Initialize Firestore client
 db = firestore.client()
 
 def add_person_to_firestore(detection_id: str, data: Dict[str, Any], wants_help: bool) -> None:

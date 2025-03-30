@@ -35,6 +35,7 @@ def get_detected_people(current_user: dict = Depends(get_current_user)) -> List[
         geo_point: GeoPoint = doc_dict.get("location")
         wants_help = doc_dict.get("wants_help")
         detected_by = doc_dict.get("detected_by")
+        id=doc_dict.get("id")
 
         # Include person only if detected by the current admin
         if detected_by == user_id and geo_point:
@@ -43,7 +44,8 @@ def get_detected_people(current_user: dict = Depends(get_current_user)) -> List[
                     timestamp=timestamp,
                     wants_help=wants_help,
                     latitude=geo_point.latitude,
-                    longitude=geo_point.longitude
+                    longitude=geo_point.longitude,
+                    id=id
                 )
             )
 
