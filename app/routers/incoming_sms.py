@@ -27,7 +27,7 @@ async def handle_sms(request: Request):
             data = pending_detections.pop(detection_id)
             
             # Actually add them with wants_help=True
-            add_person_to_firestore(detection_id, data, wants_help=True)
+            await add_person_to_firestore(detection_id, data, wants_help=True)
 
             # Construct a TwiML response
             response = MessagingResponse()
