@@ -17,7 +17,7 @@ const LoginPage = () => {
       formData.append("password", password);
       formData.append("grant_type", "password"); // Required for OAuth2PasswordRequestForm
 
-      const response = await axios.post("http://127.0.0.1:8000/login", formData, {
+      const response = await axios.post("https://skyguardian-rz2e.onrender.com/login", formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
