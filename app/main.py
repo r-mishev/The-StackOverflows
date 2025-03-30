@@ -16,7 +16,7 @@ def create_app() -> FastAPI:
 
     # Include the detection router (REST endpoints)
     app.include_router(detection.router, prefix="", tags=["detection"])
-    app.include_router(incoming_sms, prefix="", tags=["sms"])
+    app.include_router(incoming_sms.router, prefix="", tags=["sms"])
     # Include the WebSocket router
     app.include_router(ws.router, prefix="", tags=["websocket"])
 
