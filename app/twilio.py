@@ -25,7 +25,6 @@ async def wait_for_no_response(detection_id: str, timeout: int = 300):
     Wait for 5 minutes. If the user doesn't reply "HELP" in that time,
     add them to Firestore with wants_help=False.
     """
-    await asyncio.sleep(timeout)
 
     # Check if still in 'pending_detections' (it might have been removed if the user replied "HELP")
     if detection_id in pending_detections:
